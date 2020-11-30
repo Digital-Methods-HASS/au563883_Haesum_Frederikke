@@ -1,0 +1,62 @@
+---
+title: "Scraping Exercise"
+author: "Frederikke Hæsum"
+date: "11/30/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Exercise 2.2
+Use the 'rvest' library to scrape data of your interest (football statistics in Wikipedia? global population by country in https://www.worldometers.info/world-population/population-by-country/ )
+
+```{r}
+library("rvest")
+library("dplyr")
+library("tidyr")
+library("stringr")
+library("janitor")
+```
+
+# Scraping website and extracting the HTML table
+
+```{r}
+url <- "https://www.worldometers.info/world-population/population-by-country/"
+# scrape the website
+url_html <- read_html(url)
+```
+
+```{r, option3}
+whole_table <- url_html %>%
+  html_nodes("table") %>%
+  html_table()
+
+head(whole_table)
+```
+
+```{r htmltodf}
+new_table <- do.call(cbind,unlist(whole_table, recursive = FALSE)) 
+head(new_table)
+```
+The line above takes the downloaded html table, unlists it and and then combine the individual elements as columns. 
+
+## Cleaning scraped data
+I am cleaning up the data with tibble, which indicates the type of data included in each column as listed in an abbreviated fashion below the column names
+
+```{r}
+mastertable <- new_table
+mastertable <- as_tibble(mastertable)
+str(mastertable)
+```
+
+## Write result to file
+
+I'm exporting the data to a file like so: 
+
+```{r}
+data <- mastertable 
+write.csv(data,"data/populationbycountry.csv")
+```
+
