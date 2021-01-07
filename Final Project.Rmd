@@ -1,0 +1,184 @@
+---
+title: "Final Project on Loneliness"
+author: "Frederikke Hæsum"
+date: "12/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Goal 
+I want to be able to analyse my own dataset that I created via Google Forms and cleaned up using OpenRefine. I will therefore focus mainly on creating visuals by using RStudio. 
+
+# Getting set up 
+First, I will create a few subdirectories where I can store my visuals and, potentially, any altered data. 
+
+```{r}
+dir.create("data")
+dir.create("data_output")
+dir.create("fig_output")
+```
+
+Now, I will load tidyverse, which contains a number of packages that I will need for my analysis. 
+
+```{r}
+library("tidyverse")
+```
+
+# Loading the data 
+Next I am going to load my dataset by using the function read_csv 
+
+```{r}
+responses <- read_csv("data/Loneliness-clean-data.csv.csv")
+```
+
+I check the content of my data by using the view function, head function, or by simply typing the name of the data frame - responses - in the console:
+```{r}
+view(responses)
+head(responses)
+responses
+`````
+
+# Analysing my data
+Now that I am happy with the data that has been loaded correctly, I will move on to analyse the data via visualisations. 
+
+The respondents were asked whether they had been infected with COVID-19 or not. In order to see how the answers are distributed. I will do this by using plot function: 
+
+```{r}
+## create a vector from the data frame column "infected_with_covid"
+infected_with_covid <- responses$infected_with_covid
+## convert it into a factor
+infected_with_covid <- as.factor(infected_with_covid)
+## let's see what it looks like
+infected_with_covid
+```
+```{r}
+plot(infected_with_covid)
+```
+
+In order to make a proper visualisation I will need the ggplot2 package - it is already installed in the tidyverse package. 
+
+## Infected with COVID-19
+
+```{r}
+responses %>%
+    ggplot(aes(x = infected_with_covid)) +
+    geom_bar()
+```
+
+This shows a vast amount of people not being infected at any point.
+
+I will save this visual for later use: 
+```{r}
+visual_1 <- responses %>% 
+  ggplot(aes(x = infected_with_covid)) +
+    geom_bar() +
+  labs(title = "Infected with COVID-19",
+       x = "Yes or no",
+       y = "Amount of respondents")
+ggsave("fig_output/infectedwithcovid.png", visual_1, dpi = 500)
+```
+The visual will now be located in the fig_ouput directory. 
+
+## Tendencies relating to loneliness during the pandemic
+I want to look at how the different groups of respondents in terms of age, gender, and occupation have distributed their answers: 
+
+First, I will see how the different age groups are divided - I will use the same plot function as before: 
+
+```{r}
+respondent_age <- responses$respondent_age
+respondent_age <- as.factor(respondent_age)
+respondent_age
+```
+```{r}
+plot(respondent_age)
+```
+
+This shows me that the majority of the respondents are situated in the age groups 15-25 and 25-35. 
+
+However, I will create a visual that illustrates how each individual age group have answered the question of influence on their social life. I will also put gender into the visual: 
+
+```{r}
+responses %>% 
+   ggplot(aes(x = respondent_age , y = influence_on_social_life, color = respondent_gender)) +
+   geom_count()
+```
+
+I am saving the visual: 
+
+```{r}
+visual_2 <- responses %>% 
+  ggplot(aes(x = respondent_age , y = influence_on_social_life, color = respondent_gender)) +
+   geom_count() +
+  labs(title =  "Influence on social life", x = "Respondent age",
+       y = "Impact on social life")
+
+ggsave("fig_output/impactonsociallife.png", visual_2, dpi = 500)
+```
+
+## Comparison of before and during the pandemic
+
+Now, I want to make a visual that can show me, whether or not the respondents felt more lonely before or during the pandemic:
+
+I want to create the plot showing the difference between before and during the pandemic: 
+```{r}
+responses %>% 
+  ggplot(aes(x = feeling_lonely_extent)) +
+  geom_bar()
+```
+
+This shows the feeling of loneliness during the pandemic - I want to see what the respondents answered in terms of before the pandemic: 
+
+```{r}
+responses %>% 
+  ggplot(aes(x = feeling_lonely_before_pandemic)) +
+    geom_bar()
+```
+
+I am saving the two visuals for later use: 
+
+```{r}
+visual_3 <- responses %>% 
+  ggplot(aes(x = feeling_lonely_extent)) +
+  geom_bar() +
+  labs(title =  "Feeling lonely during pandeic", x = "Extent",
+       y = "Amount of respondents")
+
+ggsave("fig_output/feelinglonelyduringpandemic.png", visual_3, dpi = 500)
+```
+
+```{r}
+visual_4 <- responses %>% 
+  ggplot(aes(x = feeling_lonely_before_pandemic)) +
+  geom_bar() +
+  labs(title =  "Feeling lonely before pandeic", x = "Extent",
+       y = "Amount of respondents")
+
+ggsave("fig_output/feelinglonelybeforepandemic.png", visual_4, dpi = 500)
+```
+
+Lastly, I want to make a visual that shows what the individual occupation groups have answered as well as marital status. 
+
+```{r}
+responses %>% 
+   ggplot(aes(x = respondent_occupation , y = feeling_lonely_extent, color = marital_status)) +
+   geom_count()
+```
+
+I am saving the visual: 
+
+```{r}
+visual_5 <- responses %>% 
+   ggplot(aes(x = respondent_occupation , y = feeling_lonely_extent, color = marital_status)) +
+   geom_count() +
+  labs(title =  "Respondents marital status and occupation", x = "Occupation",
+       y = "Extent of loneliness")
+ggsave("fig_output/respondentsmaritalstatus_and_occupation.png", visual_5, dpi = 500)
+```
+
+
+
+
+
